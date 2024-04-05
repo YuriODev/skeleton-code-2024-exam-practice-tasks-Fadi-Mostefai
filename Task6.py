@@ -54,6 +54,36 @@ class Puzzle():
       self.__AllowedPatterns.append(TPattern)
       self.__AllowedSymbols.append("T")
 
+  ### CHANGES START HERE ###
+  def __SavePuzzle(self, Filename):
+    with open(Filename + ".txt", "w") as f:
+      f.write(str(len(self.__AllowedSymbols)) + "\n")
+      f.writelines(line + "\n" for line in self.__AllowedSymbols)
+      f.write(str(len(self.__AllowedPatterns)) + "\n")
+      f.writelines(P.GetSymbol() + "," + P.GetPatternSequence() + "\n" for P in self.__AllowedPatterns)
+      f.write(str(self.__GridSize) + "\n")
+      for i in range(0, (self.__GridSize) ** 2):
+        cell = self.__Grid[i]
+        if not cell.IsEmpty():
+          f.write(cell.GetSymbol())
+        else:
+          f.write("")
+        if len(cell.GetSymbolsNotAllowed()) == 1:
+          if cell.GetSymbolsNotAllowed()[0] == "":
+            f.write(",\n")
+          else:
+            f.write("," + cell.GetSymbolsNotAllowed()[0] + "\n")
+        else:
+          for blockedsymbol in cell.GetSymbolsNotAllowed():
+            if blockedsymbol != "":
+              f.write("," + blockedsymbol)
+            else:
+              continue
+          f.write("\n")
+      f.write(str(self.__Score) + "\n")
+      f.write(str(self.__SymbolsLeft))
+  ### CHANGES END HERE ###
+          
   def __LoadPuzzle(self, Filename):
     try:
       with open(Filename) as f:
@@ -112,7 +142,15 @@ class Puzzle():
         if AmountToAddToScore > 0:
           self.__Score += AmountToAddToScore
       if self.__SymbolsLeft == 0:
-        Finished = True
+        Finished = True  
+
+      ### CHANGE STARTS HERE ###   
+      save = input("Enter 'Y' if you want to save the game: ")
+      if save == "Y":
+        filename = input("Enter the name of your saved file: ")
+        self.__SavePuzzle(filename)
+      ### CHANGE ENDS HERE ###
+
     print()
     self.DisplayPuzzle()
     print()
@@ -205,6 +243,11 @@ class Pattern():
 
   def GetPatternSequence(self):
     return self.__PatternSequence
+  
+  ### CHANGE STARTS HERE ###
+  def GetSymbol(self):
+    return self.__Symbol
+  ### CHANGE ENDS HERE ###
 
 
 class Cell():
@@ -217,6 +260,11 @@ class Cell():
       return "-"
     else:
       return self._Symbol
+
+  ### CHANGE STARTS HERE ###
+  def GetSymbolsNotAllowed(self):
+    return self.__SymbolsNotAllowed
+  ### CHANGE ENDS HERE ###
 
   def IsEmpty(self):
     if len(self._Symbol) == 0:
