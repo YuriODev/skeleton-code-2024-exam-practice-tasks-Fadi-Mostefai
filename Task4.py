@@ -44,15 +44,21 @@ class Puzzle():
         self.__Grid.append(C)
       self.__AllowedPatterns = []
       self.__AllowedSymbols = []
-      QPattern = Pattern("Q", "QQ**Q**QQ")
+
+      ### CHANGE STARTS HERE ###
+      No_Q = random.randint(1, 3)
+      QPattern = Pattern("Q", "QQ**Q**QQ", No_Q)
       self.__AllowedPatterns.append(QPattern)
       self.__AllowedSymbols.append("Q")
-      XPattern = Pattern("X", "X*X*X*X*X")
+      No_X = random.randint(1, 3)
+      XPattern = Pattern("X", "X*X*X*X*X", No_X)
       self.__AllowedPatterns.append(XPattern)
       self.__AllowedSymbols.append("X")
-      TPattern = Pattern("T", "TTT**T**T")
+      No_T = random.randint(1, 3)
+      TPattern = Pattern("T", "TTT**T**T", No_T)
       self.__AllowedPatterns.append(TPattern)
       self.__AllowedSymbols.append("T")
+      ### CHANGE ENDS HERE ###
 
   def __LoadPuzzle(self, Filename):
     try:
@@ -87,6 +93,12 @@ class Puzzle():
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+
+      ### CHANGE STARTS HERE ###
+      for P in self.__AllowedPatterns:
+        P.OutputPatternCount()
+      ### CHANGE ENDS HERE ###
+
       Row = -1
       Valid = False
       while not Valid:
@@ -141,17 +153,25 @@ class Puzzle():
           PatternString += self.__GetCell(StartRow - 1, StartColumn + 1).GetSymbol()
           for P in self.__AllowedPatterns:
             CurrentSymbol = self.__GetCell(Row, Column).GetSymbol()
+
+            ### CHANGE STARTS HERE ###
             if P.MatchesPattern(PatternString, CurrentSymbol):
-              self.__GetCell(StartRow, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 1, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 2, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 2, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 2, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 1, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
-              self.__GetCell(StartRow - 1, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
-              return 10
+              if P.GetPatternCount() > 0:
+                self.__GetCell(StartRow, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 1, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 2, StartColumn + 2).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 2, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 2, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 1, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
+                self.__GetCell(StartRow - 1, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
+                P._Pattern__PatternCount -= 1
+                return 10
+              else:
+                print(f"You have run out of patterns for the {CurrentSymbol} pattern.")
+              ### CHANGE ENDS HERE ###
+
         except:
           pass
     return 0
@@ -187,9 +207,13 @@ class Puzzle():
 
 
 class Pattern():
-  def __init__(self, SymbolToUse, PatternString):
+  
+  ### CHANGE STARTS HERE ###
+  def __init__(self, SymbolToUse, PatternString, pattern_left):
     self.__Symbol = SymbolToUse
     self.__PatternSequence = PatternString
+    self.__PatternCount = pattern_left
+  ### CHANGE ENDS HERE ###
 
   def MatchesPattern(self, PatternString, SymbolPlaced):
     if SymbolPlaced != self.__Symbol:
@@ -205,6 +229,14 @@ class Pattern():
 
   def GetPatternSequence(self):
     return self.__PatternSequence
+  
+  ### CHANGE STARTS HERE ###
+  def OutputPatternCount(self):
+    print(f"There are {self.__PatternCount} {self.__Symbol} patterns left.")
+
+  def GetPatternCount(self):
+    return self.__PatternCount
+  ### CHANGE ENDS HERE ###
 
 
 class Cell():
