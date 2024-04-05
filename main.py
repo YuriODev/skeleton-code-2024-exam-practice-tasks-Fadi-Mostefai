@@ -119,6 +119,11 @@ class Puzzle():
     return self.__Score
 
   def __GetCell(self, Row, Column):
+    # Index works by:
+    # Calculating how many rows down the cell is (self.__GridSize - Row)
+    # Multiplying this by the number of cells in each row (* self.__GridSize)
+    # Add the number of cells that are in the next row (+ Column)
+    # Minus 1 as indexing for the Grid list starts at 0 (- 1)
     Index = (self.__GridSize - Row) * self.__GridSize + Column - 1
     if Index >= 0:
       return self.__Grid[Index]
