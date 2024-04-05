@@ -126,21 +126,28 @@ class Puzzle():
       raise IndexError()
 
   def CheckforMatchWithPattern(self, Row, Column):
+    CurrentSymbol = self.__GetCell(Row, Column).GetSymbol()
     for StartRow in range(Row + 2, Row - 1, -1):
       for StartColumn in range(Column - 2, Column + 1):
         try:
           PatternString = ""
-          PatternString += self.__GetCell(StartRow, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow, StartColumn + 1).GetSymbol()
-          PatternString += self.__GetCell(StartRow, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn + 1).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn + 1).GetSymbol()
+          ### CHANGE STARTS HERE ###
+          cells = []
+          cells.append(self.__GetCell(StartRow, StartColumn))
+          cells.append(self.__GetCell(StartRow, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 1))
+          for cell in cells:
+            if not(cell.CheckSymbolAllowed(CurrentSymbol)) and not(isinstance(cell, BlockedCell)):
+              return 0
+            PatternString += cell.GetSymbol()
+          ### CHANGE ENDS HERE ###
           for P in self.__AllowedPatterns:
-            CurrentSymbol = self.__GetCell(Row, Column).GetSymbol()
             if P.MatchesPattern(PatternString, CurrentSymbol):
               self.__GetCell(StartRow, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
               self.__GetCell(StartRow, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
