@@ -87,6 +87,38 @@ class Puzzle():
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+
+      ### CHANGE STARTS HERE ###
+      print(f"Symbols left: {self.__SymbolsLeft}")
+      choice = input("Enter 'Y' if you want to remove a symbol: ")
+      if choice == "Y":
+        Row = -1
+        Valid = False
+        while not Valid:
+          try:
+            Row = int(input("Enter row number: "))
+            Valid = True
+          except:
+            pass
+        Column = -1
+        Valid = False
+        while not Valid:
+          try:
+            Column = int(input("Enter column number: "))
+            Valid = True
+          except:
+            pass
+        index = (((self.__GridSize - Row) * (self.__GridSize)) + Column) - 1
+        if self.__Grid[index].IsPattern() or self.__Grid[index].IsEmpty() or isinstance(self.__Grid[index], BlockedCell):
+          print("This cell cannot be modified.")
+        else:
+          self.__Grid[index] = Cell()
+          self.__SymbolsLeft += 1
+        self.DisplayPuzzle()
+        print("Current score: " + str(self.__Score))
+        print(f"Symbols left: {self.__SymbolsLeft}")
+      ### CHANGE ENDS HERE ###
+
       Row = -1
       Valid = False
       while not Valid:
@@ -217,6 +249,14 @@ class Cell():
       return "-"
     else:
       return self._Symbol
+    
+  ### CHANGE STARTS HERE ###
+  def IsPattern(self):
+    if len(self.__SymbolsNotAllowed) == 1 and self.__SymbolsNotAllowed[0] == '':
+      return False
+    else:
+      return True
+  ### CHANGE ENDS HERE ###
 
   def IsEmpty(self):
     if len(self._Symbol) == 0:
