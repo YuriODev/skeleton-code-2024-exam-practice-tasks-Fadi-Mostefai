@@ -87,12 +87,15 @@ class Puzzle():
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+      ### CHANGES START HERE ###
+      print(f"Symbols left: {self.__SymbolsLeft}")
       Row = -1
       Valid = False
       while not Valid:
         try:
           Row = int(input("Enter row number: "))
-          Valid = True
+          if 1 <= Row <= self.__GridSize:
+            Valid = True
         except:
           pass
       Column = -1
@@ -100,15 +103,19 @@ class Puzzle():
       while not Valid:
         try:
           Column = int(input("Enter column number: "))
-          Valid = True
+          if 1 <= Column <= self.__GridSize:
+            Valid = True
         except:
           pass
       Symbol = self.__GetSymbolFromUser()
-      self.__SymbolsLeft -= 1
       CurrentCell = self.__GetCell(Row, Column)
-      if CurrentCell.CheckSymbolAllowed(Symbol):
+      if not(CurrentCell.CheckSymbolAllowed(Symbol)) or (not(CurrentCell.IsEmpty()) and CurrentCell.IsPattern()):
+        print("Cannot put symbol into this cell.")
+      else:
+        self.__SymbolsLeft -= 1
         CurrentCell.ChangeSymbolInCell(Symbol)
         AmountToAddToScore = self.CheckforMatchWithPattern(Row, Column)
+      ### CHANGES END HERE ###
         if AmountToAddToScore > 0:
           self.__Score += AmountToAddToScore
       if self.__SymbolsLeft == 0:
@@ -217,6 +224,14 @@ class Cell():
       return "-"
     else:
       return self._Symbol
+
+  ### CHANGES START HERE ###
+  def IsPattern(self):
+    if len(self.__SymbolsNotAllowed) == 1 and self.__SymbolsNotAllowed[0] == "":
+      return False
+    else:
+      return True
+  ### CHANGES END HERE ###
 
   def IsEmpty(self):
     if len(self._Symbol) == 0:
