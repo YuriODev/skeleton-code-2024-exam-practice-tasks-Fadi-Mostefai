@@ -42,6 +42,14 @@ class Puzzle():
         else:
           C = BlockedCell()
         self.__Grid.append(C)
+      ### CHANGE STARTS HERE ###
+      count = 0
+      while count < 5:
+        randompos = random.randint(0, (self.__GridSize ** 2) - 1)
+        if self.__Grid[randompos].IsEmpty():
+          self.__Grid[randompos] = DoublePointCell()
+          count += 1
+      ### CHANGE ENDS HERE ###
       self.__AllowedPatterns = []
       self.__AllowedSymbols = []
       QPattern = Pattern("Q", "QQ**Q**QQ")
@@ -130,15 +138,19 @@ class Puzzle():
       for StartColumn in range(Column - 2, Column + 1):
         try:
           PatternString = ""
-          PatternString += self.__GetCell(StartRow, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow, StartColumn + 1).GetSymbol()
-          PatternString += self.__GetCell(StartRow, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn + 2).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn + 1).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 2, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn).GetSymbol()
-          PatternString += self.__GetCell(StartRow - 1, StartColumn + 1).GetSymbol()
+          ### CHANGE STARTS HERE ###
+          cells = []
+          cells.append(self.__GetCell(StartRow, StartColumn))
+          cells.append(self.__GetCell(StartRow, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 1))
+          for cell in cells:
+            PatternString += cell.GetSymbol()
           for P in self.__AllowedPatterns:
             CurrentSymbol = self.__GetCell(Row, Column).GetSymbol()
             if P.MatchesPattern(PatternString, CurrentSymbol):
@@ -151,6 +163,10 @@ class Puzzle():
               self.__GetCell(StartRow - 2, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
               self.__GetCell(StartRow - 1, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
               self.__GetCell(StartRow - 1, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
+              for cell in cells:
+                if cell.IsDouble():
+                  return 20
+          ### CHANGE ENDS HERE ###
               return 10
         except:
           pass
@@ -239,6 +255,10 @@ class Cell():
   def UpdateCell(self):
     pass
 
+  ### CHANGE STARTS HERE ###
+  def IsDouble(self):
+    return False
+  ### CHANGE ENDS HERE ###
 
 class BlockedCell(Cell):
   def __init__(self):
@@ -248,6 +268,16 @@ class BlockedCell(Cell):
   def CheckSymbolAllowed(self, SymbolToCheck):
     return False
 
+
+### CHANGE STARTS HERE ###
+class DoublePointCell(Cell):
+  def __init__(self):
+    super().__init__()
+    self._Symbol = "D"
+
+  def IsDouble(self):
+    return True
+### CHANGE ENDS HERE ###
 
 if __name__ == "__main__":
   Main()
