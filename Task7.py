@@ -82,11 +82,37 @@ class Puzzle():
     except:
       print("Puzzle not loaded")
 
+  ### CHANGES START HERE ###
+  def UndoPreviousMove(self, Previous_Cells, undomoves):
+    choice = input("Enter 'Y' if you want to undo the last move: ")
+    if choice == "Y":
+      Previous_Cell = Previous_Cells[-1]
+      Previous_Cell.GetCell(self.__Grid, self.__GridSize).UpdateCell(Previous_Cell.GetSymbol(), Previous_Cell.GetSymbolsNotAllowed())
+      Previous_Cells.pop()
+      undomoves -= 1
+  ### CHANGES END HERE ###
+
   def AttemptPuzzle(self):
     Finished = False
+
+    ### CHANGES START HERE ###
+    self.Previous_Cells = []
+    self.undomoves = 0
+    ### CHANGES END HERE ###
+
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+
+      ### CHANGES START HERE ###
+      print(f"You have {self.undomoves} moves you can undo")
+      if self.undomoves > 0:
+        self.UndoPreviousMove(self.Previous_Cells, self.undomoves)
+        self.DisplayPuzzle()
+        print("Current score: " + str(self.__Score))
+        print(f"You have {self.undomoves} moves you can undo")
+      ### CHANGES END HERE ###
+
       Row = -1
       Valid = False
       while not Valid:
@@ -105,7 +131,15 @@ class Puzzle():
           pass
       Symbol = self.__GetSymbolFromUser()
       self.__SymbolsLeft -= 1
+
+      ### CHANGES START HERE ###
       CurrentCell = self.__GetCell(Row, Column)
+      PreviousCell = PreviousMove(Row, Column)
+      PreviousCell.UpdateCell(CurrentCell.GetSymbol(), CurrentCell.GetSymbolsNotAllowed())
+      self.Previous_Cells.append(PreviousCell)
+      self.undomoves += 1
+      ### CHANGES END HERE ###
+
       if CurrentCell.CheckSymbolAllowed(Symbol):
         CurrentCell.ChangeSymbolInCell(Symbol)
         AmountToAddToScore = self.CheckforMatchWithPattern(Row, Column)
@@ -218,6 +252,11 @@ class Cell():
     else:
       return self._Symbol
 
+  ### CHANGES START HERE ###
+  def GetSymbolsNotAllowed(self):
+    return self.__SymbolsNotAllowed
+  ### CHANGES END HERE ###
+
   def IsEmpty(self):
     if len(self._Symbol) == 0:
       return True
@@ -236,8 +275,11 @@ class Cell():
   def AddToNotAllowedSymbols(self, SymbolToAdd):
     self.__SymbolsNotAllowed.append(SymbolToAdd)
 
-  def UpdateCell(self):
-    pass
+  ### CHANGES START HERE ###
+  def UpdateCell(self, Symbol, SymbolsNotAllowed):
+    self._Symbol = Symbol
+    self.__SymbolsNotAllowed = SymbolsNotAllowed
+  ### CHANGES END HERE ###
 
 
 class BlockedCell(Cell):
@@ -248,6 +290,18 @@ class BlockedCell(Cell):
   def CheckSymbolAllowed(self, SymbolToCheck):
     return False
 
+
+### CHANGES START HERE ###
+class PreviousMove(Cell):
+  def __init__(self, row, column):
+    super()
+    self._row = row
+    self._column = column
+
+  def GetCell(self, Grid, GridSize):
+    index = (((GridSize - self._row) * GridSize) + self._column) - 1
+    return Grid[index]
+### CHANGES END HERE ###
 
 if __name__ == "__main__":
   Main()
