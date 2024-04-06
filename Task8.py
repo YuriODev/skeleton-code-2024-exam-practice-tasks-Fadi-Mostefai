@@ -109,8 +109,15 @@ class Puzzle():
       if CurrentCell.CheckSymbolAllowed(Symbol):
         CurrentCell.ChangeSymbolInCell(Symbol)
         AmountToAddToScore = self.CheckforMatchWithPattern(Row, Column)
+
+        ### CHANGE STARTS HERE ###
         if AmountToAddToScore > 0:
+          choice = input("Enter 'Y' if you want to reshuffle the blocked cells: ")
+          if choice == "Y":
+            self.ReShuffleBlockedCells()
           self.__Score += AmountToAddToScore
+        ### CHANGE ENDS HERE ###
+
       if self.__SymbolsLeft == 0:
         Finished = True
     print()
@@ -184,6 +191,21 @@ class Puzzle():
       if (Count + 1) % self.__GridSize == 0:
         print("|")
         print(self.__CreateHorizontalLine())
+
+  ### CHANGE STARTS HERE ###
+  def ReShuffleBlockedCells(self):
+    pos_for_blocked_cells = []
+    for i in range(0, self.__GridSize ** 2):
+      if isinstance(self.__Grid[i], BlockedCell):
+        pos_for_blocked_cells.append(i)
+    for i in range(0, self.__GridSize ** 2):
+      if isinstance(self.__Grid[i], BlockedCell):
+        randompos = random.randint(0, self.__GridSize ** 2)
+        while randompos in pos_for_blocked_cells or not(self.__Grid[randompos].IsEmpty()):
+          randompos = random.randint(0, self.__GridSize ** 2)
+        self.__Grid[randompos] = self.__Grid[i]
+        self.__Grid[i] = Cell()
+  ### CHANGE ENDS HERE ###
 
 
 class Pattern():
