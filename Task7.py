@@ -90,6 +90,7 @@ class Puzzle():
       Previous_Cell.GetCell(self.__Grid, self.__GridSize).UpdateCell(Previous_Cell.GetSymbol(), Previous_Cell.GetSymbolsNotAllowed())
       Previous_Cells.pop()
       undomoves -= 1
+      return Previous_Cells, undomoves
   ### CHANGES END HERE ###
 
   def AttemptPuzzle(self):
@@ -107,7 +108,7 @@ class Puzzle():
       ### CHANGES START HERE ###
       print(f"You have {self.undomoves} moves you can undo")
       if self.undomoves > 0:
-        self.UndoPreviousMove(self.Previous_Cells, self.undomoves)
+        self.Previous_Cells, self.undomoves = self.UndoPreviousMove(self.Previous_Cells, self.undomoves)
         self.DisplayPuzzle()
         print("Current score: " + str(self.__Score))
         print(f"You have {self.undomoves} moves you can undo")
