@@ -30,12 +30,18 @@ class Puzzle():
       self.__Grid = []
       self.__AllowedPatterns = []
       self.__AllowedSymbols = []
+      ### CHANGES START HERE ####
+      self.patternsmatched = 0
+      self.lever = 0
       self.__LoadPuzzle(args[0])
     else:
       self.__Score = 0
       self.__SymbolsLeft = args[1]
       self.__GridSize = args[0]
       self.__Grid = []
+      self.patternsmatched = 0
+      self.lever = 0
+      ### CHANGES END HERE ###
       for Count in range(1, self.__GridSize * self.__GridSize + 1):
         if random.randrange(1, 101) < 90:
           C = Cell()
@@ -87,6 +93,15 @@ class Puzzle():
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+      ### CHANGES START HERE ###
+      if self.lever == 1:
+        print(f"You have a lever available to use.")
+        choice = input("Enter 'Y' to use the lever: ")
+        if choice == 'Y':
+          self._lever()
+          self.DisplayPuzzle()
+          print("Current score: " + str(self.__Score))
+      ### CHANGES END HERE ###
       Row = -1
       Valid = False
       while not Valid:
@@ -125,6 +140,24 @@ class Puzzle():
     else:
       raise IndexError()
 
+  ### CHANGES START HERE ###
+  def _lever(self):
+    pos_for_blocked_cells = []
+    for i in range(self.__GridSize ** 2):
+      if isinstance(self.__Grid[i], BlockedCell):
+        pos_for_blocked_cells.append(i)
+    row = int(input("Enter row number: "))
+    column = int(input("Enter column number: "))
+    index = (((self.__GridSize - row) * self.__GridSize) + column) - 1
+    while index not in pos_for_blocked_cells:
+      print("This is not a blocked cell.")
+      row = int(input("Enter row number: "))
+      column = int(input("Enter column number: "))
+      index = (((self.__GridSize - row) * self.__GridSize) + column) - 1
+    self.__Grid[index] = Cell()
+    self.lever = 0
+  ### CHANGES END HERE ###
+
   def CheckforMatchWithPattern(self, Row, Column):
     for StartRow in range(Row + 2, Row - 1, -1):
       for StartColumn in range(Column - 2, Column + 1):
@@ -151,6 +184,11 @@ class Puzzle():
               self.__GetCell(StartRow - 2, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
               self.__GetCell(StartRow - 1, StartColumn).AddToNotAllowedSymbols(CurrentSymbol)
               self.__GetCell(StartRow - 1, StartColumn + 1).AddToNotAllowedSymbols(CurrentSymbol)
+              ### CHANGES START HERE ###
+              if self.patternsmatched == 0:
+                self.patternsmatched = 1
+                self.lever = 1
+              ### CHANGES END HERE ###
               return 10
         except:
           pass
