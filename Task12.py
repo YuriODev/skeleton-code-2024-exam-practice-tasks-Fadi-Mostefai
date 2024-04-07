@@ -82,11 +82,42 @@ class Puzzle():
     except:
       print("Puzzle not loaded")
 
+  ### CHANGES START HERE ###
+  def SwampThisCell(self, no_of_swamp):
+    count = 0
+    while count != no_of_swamp:
+      pos = random.randint(0, (self.__GridSize ** 2) - 1)
+      while not self.__Grid[pos].IsEmpty():
+        pos = random.randint(0, (self.__GridSize ** 2) - 1)
+      self.__Grid[pos] = BlockedCell()
+      self.__Grid[pos].UpdateCell()
+      count += 1
+  ### CHANGES END HERE
+
   def AttemptPuzzle(self):
     Finished = False
+    ### CHANGES START HERE ###
+    swampcell = False
     while not Finished:
-      self.DisplayPuzzle()
-      print("Current score: " + str(self.__Score))
+      if not swampcell:
+        if random.randint(1,4) == 4:
+          turns_swampcell = random.randint(2,4)
+          no_of_swamp = random.randint(1,4)
+          swampcell = True
+        else:  
+          self.DisplayPuzzle()
+          print("Current score: " + str(self.__Score))
+      if swampcell:
+        if turns_swampcell == 0:
+          self.SwampThisCell(no_of_swamp)
+          self.DisplayPuzzle()
+          print("Current score: " + str(self.__Score))
+        else:
+          self.DisplayPuzzle()
+          print("Current score: " + str(self.__Score))
+          print(f"You have {turns_swampcell} turns left before a swamp event. {no_of_swamp} swamps will be placed.")
+          turns_swampcell -= 1
+    ### CHANGES END HERE ###
       Row = -1
       Valid = False
       while not Valid:
@@ -248,6 +279,10 @@ class BlockedCell(Cell):
   def CheckSymbolAllowed(self, SymbolToCheck):
     return False
 
+  def UpdateCell(self):
+    ### CHANGES START HERE ###
+    self._Symbol = "!"
+    ### CHANGES END HERE ###
 
 if __name__ == "__main__":
   Main()
