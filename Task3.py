@@ -130,7 +130,7 @@ class Puzzle():
       for StartColumn in range(Column - 2, Column + 1):
         try:
           ### CHANGE STARTS HERE ###
-          if not(2 < StartRow < self.__GridSize) or not(0 < StartColumn < self.__GridSize - 1):
+          if not(2 < StartRow <= self.__GridSize) or not(0 < StartColumn < self.__GridSize - 1):
             return 0
           ### CHANGE ENDS HERE ###
           PatternString = ""
