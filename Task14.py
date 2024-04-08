@@ -79,6 +79,12 @@ class Puzzle():
             self.__Grid.append(C)
         self.__Score = int(f.readline().rstrip())
         self.__SymbolsLeft = int(f.readline().rstrip())
+        ### CHANGES START HERE ###
+        if self.TestForError1():
+          print("Puzzle demonstrates Error 1")
+        elif self.TestForError2():
+          print("Puzzle demonstrates Error 2")
+        ### CHANGES END HERE ###
     except:
       print("Puzzle not loaded")
 
@@ -117,6 +123,23 @@ class Puzzle():
     self.DisplayPuzzle()
     print()
     return self.__Score
+
+  ### CHANGES START HERE ###
+  def TestForError1(self):
+    for index in range(self.__GridSize ** 2):
+      if self.__Grid[index].ContainsSymbolsNotAllowedList() and not(isinstance(self.__Grid[index], BlockedCell)) and self.__Score == 0:
+        return True
+      else:
+        return False
+      
+  def TestForError2(self):
+    calculated_count = 0
+    for index in range(self.__GridSize ** 2):
+      if self.__Grid[index].ContainsSymbolsNotAllowedList():
+        calculated_count += 1
+    predicted_count = (self.__Score // 10) * 9
+    return True if calculated_count < predicted_count else False
+  ### CHANGES END HERE ###
 
   def __GetCell(self, Row, Column):
     Index = (self.__GridSize - Row) * self.__GridSize + Column - 1
@@ -236,6 +259,11 @@ class Cell():
   def AddToNotAllowedSymbols(self, SymbolToAdd):
     self.__SymbolsNotAllowed.append(SymbolToAdd)
 
+  ### CHANGES START HERE ###
+  def ContainsSymbolsNotAllowedList(self):
+    return False if len(self.__SymbolsNotAllowed) == 1 and self.__SymbolsNotAllowed[0] == "" else True
+  ### CHANGES END HERE ###
+
   def UpdateCell(self):
     pass
 
@@ -244,6 +272,11 @@ class BlockedCell(Cell):
   def __init__(self):
     super(BlockedCell, self).__init__()
     self._Symbol = "@"
+
+  ### CHANGES START HERE ###
+  def ContainsSymbolsNotAllowedList(self):
+    return True
+  ### CHANGES END HERE ###
 
   def CheckSymbolAllowed(self, SymbolToCheck):
     return False
