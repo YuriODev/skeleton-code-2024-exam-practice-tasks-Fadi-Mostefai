@@ -84,9 +84,24 @@ class Puzzle():
 
   def AttemptPuzzle(self):
     Finished = False
+    ### CHANGES START HERE ###
+    spaceleft_num = []
+    spaceleft_bool = False
     while not Finished:
       self.DisplayPuzzle()
       print("Current score: " + str(self.__Score))
+      if spaceleft_bool:
+        for num in spaceleft_num:
+          if num <= self.__SymbolsLeft and num != 0:
+            Finished = False
+            break
+          else:
+            Finished = True
+        if Finished:
+          print(f"There are not enough symbols to complete the puzzle. {self.__SymbolsLeft} points will be deducted from your final score.")
+          self.__Score -= self.__SymbolsLeft
+          return self.__Score
+    ### CHANGES END HERE ###
       Row = -1
       Valid = False
       while not Valid:
@@ -109,6 +124,12 @@ class Puzzle():
       if CurrentCell.CheckSymbolAllowed(Symbol):
         CurrentCell.ChangeSymbolInCell(Symbol)
         AmountToAddToScore = self.CheckforMatchWithPattern(Row, Column)
+        ### CHANGES START HERE ###
+        spaceleft_num = self.GetSpaceLeftOnGrid()
+        print(spaceleft_num)
+        print(self.__SymbolsLeft)
+        spaceleft_bool = True
+        ### CHANGES END HERE ###
         if AmountToAddToScore > 0:
           self.__Score += AmountToAddToScore
       if self.__SymbolsLeft == 0:
@@ -156,6 +177,42 @@ class Puzzle():
           pass
     return 0
 
+  ### CHANGES START HERE ###
+  def GetSpaceLeftOnGrid(self):
+    patterns = []
+    cells_list = []
+    sortedallowedsymbols = ['Q', 'X', 'T']
+    spaceleft = []
+    for StartRow in range(self.__GridSize, 0, -1):
+      for StartColumn in range(1, self.__GridSize + 1):
+        if 2 < StartRow <= self.__GridSize and 0 < StartColumn < self.__GridSize - 1:
+          #print(f"Row: {StartRow}, Column: {StartColumn}")
+          cells = []
+          patternstring = ""
+          cells.append(self.__GetCell(StartRow, StartColumn))
+          cells.append(self.__GetCell(StartRow, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 2))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn + 1))
+          cells.append(self.__GetCell(StartRow - 2, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn))
+          cells.append(self.__GetCell(StartRow - 1, StartColumn + 1))
+          for cell in cells:
+            patternstring += cell.GetSymbol()
+          patterns.append(patternstring)
+          cells_list.append(cells)
+    for pattern, cells in zip(patterns, cells_list):
+      for P, S in zip(self.__AllowedPatterns, sortedallowedsymbols):
+        #print(f"Patterntocheck: {pattern}, Patternvalid: {P.GetPatternSequence()}, Symbol: {S}")
+        if P.MatchesPattern(pattern, S):
+          continue
+        spaceleft.append(P.SpaceLeft(pattern, S, cells))
+        #print(spaceleft)
+    return spaceleft
+  ### CHANGES END HERE ###
+
+
   def __GetSymbolFromUser(self):
     Symbol = ""
     while not Symbol in self.__AllowedSymbols:
@@ -202,6 +259,31 @@ class Pattern():
       except Exception as ex:
         print(f"EXCEPTION in MatchesPattern: {ex}")
     return True
+
+  ### CHANGES START HERE ###
+  def SpaceLeft(self, PatternString, Symbol, cells):
+    array = []
+    new_string = ""
+    if Symbol != self.__Symbol:
+      return 0
+    else: 
+      for char in PatternString:
+        array.append(char)
+      count = 0
+      index = 0
+      for char1, char2 in zip(PatternString, self.__PatternSequence):
+        if char1 != char2 and char2 != "*" and char1 != "@" and cells[index].CheckSymbolAllowed(Symbol):
+          count += 1
+          array[index] = char2
+        index += 1
+      for char in array:
+        new_string += char
+      #print(f"Fixed Pattern String: {new_string}")
+      if self.MatchesPattern(new_string, Symbol):
+        return count
+      else:
+        return 0
+  ### CHANGES END HERE ###
 
   def GetPatternSequence(self):
     return self.__PatternSequence
