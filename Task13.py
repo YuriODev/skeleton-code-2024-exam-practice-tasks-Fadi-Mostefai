@@ -88,8 +88,6 @@ class Puzzle():
     spaceleft_num = []
     spaceleft_bool = False
     while not Finished:
-      self.DisplayPuzzle()
-      print("Current score: " + str(self.__Score))
       if spaceleft_bool:
         for num in spaceleft_num:
           if num <= self.__SymbolsLeft and num != 0:
@@ -100,8 +98,10 @@ class Puzzle():
         if Finished:
           print(f"There are not enough symbols to complete the puzzle. {self.__SymbolsLeft} points will be deducted from your final score.")
           self.__Score -= self.__SymbolsLeft
-          return self.__Score
+          break
     ### CHANGES END HERE ###
+      self.DisplayPuzzle()
+      print("Current score: " + str(self.__Score))
       Row = -1
       Valid = False
       while not Valid:
@@ -126,8 +126,8 @@ class Puzzle():
         AmountToAddToScore = self.CheckforMatchWithPattern(Row, Column)
         ### CHANGES START HERE ###
         spaceleft_num = self.GetSpaceLeftOnGrid()
-        print(spaceleft_num)
-        print(self.__SymbolsLeft)
+        #print(spaceleft_num)
+        #print(self.__SymbolsLeft)
         spaceleft_bool = True
         ### CHANGES END HERE ###
         if AmountToAddToScore > 0:
